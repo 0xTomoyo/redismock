@@ -469,6 +469,14 @@ var _ = Describe("RedisMock", func() {
 			})
 		})
 
+		It("ExpireNX", func() {
+			operationBoolCmd(clusterMock, func() *ExpectedBool {
+				return clusterMock.ExpectExpireNX("key", 1*time.Second)
+			}, func() *redis.BoolCmd {
+				return client.ExpireNX(ctx, "key", 1*time.Second)
+			})
+		})
+
 		It("ExpireAt", func() {
 			now := time.Now()
 			operationBoolCmd(clusterMock, func() *ExpectedBool {

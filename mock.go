@@ -257,7 +257,9 @@ func (m *mock) compare(isRegexp bool, expect, cmd interface{}) error {
 
 // using map in command leads to disorder, change the command parameter to map[string]interface{}
 // for example:
+//
 //	[mset key1 value1 key2 value2] => [mset map[string]interface{}{"key1": "value1", "key2": "value2"}]
+//
 // return bool, is it handled
 func (m *mock) mapArgs(cmd string, cmdArgs *[]interface{}) bool {
 	var cut int
@@ -474,6 +476,13 @@ func (m *mock) ExpectExists(keys ...string) *ExpectedInt {
 func (m *mock) ExpectExpire(key string, expiration time.Duration) *ExpectedBool {
 	e := &ExpectedBool{}
 	e.cmd = m.factory.Expire(m.ctx, key, expiration)
+	m.pushExpect(e)
+	return e
+}
+
+func (m *mock) ExpectExpireNX(key string, expiration time.Duration) *ExpectedBool {
+	e := &ExpectedBool{}
+	e.cmd = m.factory.ExpireNX(m.ctx, key, expiration)
 	m.pushExpect(e)
 	return e
 }

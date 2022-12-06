@@ -3,8 +3,9 @@ package redismock
 import (
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"time"
+
+	"github.com/go-redis/redis/v8"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -467,6 +468,14 @@ var _ = Describe("RedisMock", func() {
 				return clientMock.ExpectExpire("key", 1*time.Second)
 			}, func() *redis.BoolCmd {
 				return client.Expire(ctx, "key", 1*time.Second)
+			})
+		})
+
+		It("ExpireNX", func() {
+			operationBoolCmd(clientMock, func() *ExpectedBool {
+				return clientMock.ExpectExpireNX("key", 1*time.Second)
+			}, func() *redis.BoolCmd {
+				return client.ExpireNX(ctx, "key", 1*time.Second)
 			})
 		})
 
