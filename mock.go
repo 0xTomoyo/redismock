@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -25,6 +26,8 @@ type mock struct {
 
 	expectRegexp bool
 	expectCustom CustomMatch
+
+	mu sync.Mutex
 }
 
 const (
@@ -115,6 +118,9 @@ func (h redisClientHook) AfterProcessPipeline(_ context.Context, cmds []redis.Cm
 //----------------------------------
 
 func (m *mock) process(cmd redis.Cmder) (err error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	var miss int
 	var expect expectation = nil
 
@@ -315,6 +321,9 @@ func (m *mock) mapArgs(cmd string, cmdArgs *[]interface{}) bool {
 }
 
 func (m *mock) pushExpect(e expectation) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	if m.expectRegexp {
 		e.setRegexpMatch()
 	}
@@ -329,6 +338,9 @@ func (m *mock) pushExpect(e expectation) {
 }
 
 func (m *mock) ClearExpect() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	if m.parent != nil {
 		m.parent.ClearExpect()
 		return
@@ -359,6 +371,9 @@ func (m *mock) CustomMatch(fn CustomMatch) *mock {
 }
 
 func (m *mock) ExpectationsWereMet() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	if m.parent != nil {
 		return m.ExpectationsWereMet()
 	}
