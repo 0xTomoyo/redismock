@@ -2,8 +2,9 @@ package ordinary
 
 import (
 	"errors"
-	"github.com/go-redis/redismock/v8"
 	"testing"
+
+	"github.com/0xTomoyo/redismock/v8"
 )
 
 func TestItemCacheFail(t *testing.T) {
